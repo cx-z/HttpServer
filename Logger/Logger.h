@@ -9,6 +9,8 @@
 #include <mutex>
 #include <condition_variable>
 
+#define LOG(logger, message) (logger).log((message), __FILE__, __FUNCTION__)
+
 class Logger {
 private:
     std::ofstream logFile;
@@ -24,7 +26,7 @@ public:
     Logger();
     ~Logger();
 
-    void log(const std::string& message);
+    void log(const std::string& message, const std::string& file, const std::string& function);
 };
 
 #endif // LOGGER_H

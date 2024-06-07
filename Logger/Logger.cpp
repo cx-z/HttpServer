@@ -5,6 +5,17 @@
 #include <sstream>
 #include <sys/stat.h>
 
+const std::string rootFolderName = "/HttpServer/";
+
+std::string getRelativePath(const std::string& fullPath) {
+    auto pos = fullPath.find(rootFolderName);
+    if (pos != std::string::npos) {
+        // +1 是为了保留开始的斜杠 '/'
+        return fullPath.substr(pos + 1);
+    }
+    return fullPath; // 如果找不到项目根目录名称，返回完整路径
+}
+
 Logger::Logger() : exit(false)
 {
     // 创建 Logs 子目录
@@ -39,8 +50,7 @@ Logger::~Logger()
     }
 }
 
-void Logger::log(const std::string &message)
-{
+void Logger::log(const std::string& message, const std::string& file, const std::string& function) {
     std::ostringstream timestamp;
     auto now = std::chrono::system_clock::now();
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
@@ -48,10 +58,11 @@ void Logger::log(const std::string &message)
     auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
 
     timestamp << std::put_time(&localtime, "%Y-%m-%d %H:%M:%S");
-    timestamp << '.' << std::setfill('0') << std::setw(3) << now_ms.count() << ": ";
+    timestamp << '.' << std::setfill('0') << std::setw(3) << now_ms.count();
+    timestamp << " [" << getRelativePath(file) << "::" << function << "]: " << message;
 
     std::lock_guard<std::mutex> lock(mtx);
-    logQueue.push(timestamp.str() + message);
+    logQueue.push(timestamp.str());
     cv.notify_one();
 }
 
