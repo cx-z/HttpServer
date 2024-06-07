@@ -4,7 +4,7 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "cmake --build /Users/bytedance/Projects/HttpServer/build",
+            "command": "cmake --build ${workspaceFolder}/build",
             "group": "build",
             "problemMatcher": [
                 "$gcc"
