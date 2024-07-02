@@ -14,6 +14,9 @@ add_executable(HttpServer main.cpp)
 
 # 包含子目录
 add_subdirectory(Logger)
+add_subdirectory(Listener)
+add_subdirectory(Responder)
+add_subdirectory(Utils)
 
 # 链接 Logger 库到主可执行文件
 target_link_libraries(HttpServer Logger)
