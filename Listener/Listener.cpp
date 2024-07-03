@@ -1,33 +1,51 @@
 #include "Listener.h"
 
-Listener::Listener(/* args */)
+#include <arpa/inet.h> 
+
+Listener::Listener(const std::string& ip, int p) : ip_address(ip), port(p)
 {
     responder = Responder();
+    running = false;
+
+    ListenerSetupErrorCode setupCode = setupListener();
+    if (setupCode != ListenerSetupErrorCode_Success) {
+        std::cerr << "Failed to set up listener, error code: " << setupCode << std::endl;
+        // 处理错误，例如抛出异常或设置某种错误状态
+    }
 }
 
 Listener::~Listener()
 {
     stopListener();
-    close(sock);
-    close(server_fd);
+    if (server_fd != -1)
+        close(server_fd);
 }
 
 ListenerSetupErrorCode Listener::setupListener() {
     // 创建 socket 文件描述符
-    int createSockCode = (server_fd = socket(AF_INET, SOCK_STREAM, 0));
-    if (createSockCode == 0) {
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
         perror("socket failed");
         return ListenerSetupErrorCode_CreateSocketFailed;
     }
 
     // 强制端口和地址的使用
     int opt = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        perror("setsockopt");
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+        perror("setsockopt SO_REUSEADDR failed");
+        return ListenerSetupErrorCode_SetSockOptFailed;
+    }
+
+    // 强制端口重用
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt))) {
+        perror("setsockopt SO_REUSEPORT failed");
         return ListenerSetupErrorCode_SetSockOptFailed;
     }
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
+    if (inet_pton(AF_INET, ip_address.c_str(), &address.sin_addr) <= 0) {
+        perror("inet_pton failed");
+        return ListenerSetupErrorCode_BindAddressFailed;
+    }
     address.sin_port = htons(port);
 
     // 绑定到端口

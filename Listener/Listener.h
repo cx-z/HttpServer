@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <thread>
+#include <atomic>
 
 #include "Responder.h"
 
@@ -23,18 +24,19 @@ class Listener
 private:
     int server_fd;
     int port;
+    std::string ip_address;
     struct sockaddr_in address;
-    int sock;
     Responder responder;
 
     std::thread listener_thread;
     std::atomic<bool> running;
 
+    ListenerSetupErrorCode listenForConnections();
+public:
+    Listener(const std::string& ip, int port);
+    ~Listener();
+
     ListenerSetupErrorCode setupListener();
     ListenerSetupErrorCode startListener();
     void stopListener();
-    ListenerSetupErrorCode listenForConnections();
-public:
-    Listener(/* args */);
-    ~Listener();
 };

@@ -1,5 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #include"Utils.h"
 
@@ -37,5 +36,3 @@ public:
     static Logger* getInstance();
     void log(const std::string& message, const std::string& file, const std::string& function);
 };
-
-#endif // LOGGER_H

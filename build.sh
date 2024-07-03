@@ -35,14 +35,14 @@ run_project() {
     build_project
 
     # 检查可执行文件是否存在
-    if [ ! -f "build/HttpClient" ]; then
+    if [ ! -f "build/HttpServer" ]; then
         echo "Executable not found. Build may have failed."
         exit 1
     fi
 
     # 运行可执行文件
-    echo "Running HttpClient..."
-    ./build/HttpClient
+    echo "Running HttpServer..."
+    ./build/HttpServer
 }
 
 # 函数定义：清理项目
