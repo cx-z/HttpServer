@@ -19,4 +19,4 @@ add_subdirectory(Responder)
 add_subdirectory(Utils)
 
 # 链接 Logger 库到主可执行文件
-target_link_libraries(HttpServer Logger)
+target_link_libraries(HttpServer Logger Listener)
