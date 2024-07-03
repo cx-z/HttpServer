@@ -1,8 +1,8 @@
-#include "Listener.h"
-
+#include <iostream>
 #include <signal.h>
 
-// 使用全局变量listener
+#include "Listener.h"
+
 Listener* g_listener = nullptr;
 
 void signalHandler(int signum) {
@@ -14,7 +14,10 @@ void signalHandler(int signum) {
 }
 
 int main() {
-    Listener listener("127.0.0.1", 8080);
+    std::string ip_address = "127.0.0.1"; // 监听的IP地址
+    int port = 8080; // 监听的端口号
+
+    Listener listener(ip_address, port); // 创建Listener实例
     g_listener = &listener;
 
     // 启动监听器
@@ -24,12 +27,13 @@ int main() {
         return 1;
     }
 
-    std::cout << "Server is listening on 127.0.0.1:8080 " << std::endl;
+    std::cout << "Server is listening on IP " << ip_address << " and port " << port << std::endl;
 
-    // 简单的方式保持主线程运行，接收信号以停止服务器
+    // 设置信号处理函数，以便在接收到中断信号时停止服务器
     signal(SIGINT, signalHandler);
 
-    while(true) {
+    // 简单的方式保持主线程运行
+    while (true) {
         sleep(1); // 保持主线程活动，可以使用更优雅的方式保持长时间运行。
     }
 
